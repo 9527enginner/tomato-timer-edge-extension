@@ -1,4 +1,4 @@
-// 设置番茄钟的默认设置
+// 設置番茄鐘的默認设置
 const defaultSettings = {
   workTime: 25,
   breakTime: 5,
@@ -6,11 +6,11 @@ const defaultSettings = {
   longBreakInterval: 4
 };
 
-// 初始化番茄钟的状态
+// 初始化番茄鐘
 let timerId;
 let settings = {};
 
-// 加载设置
+// 加載设置設置
 chrome.storage.sync.get(defaultSettings, (items) => {
   settings = items;
 });
@@ -34,10 +34,6 @@ function createTimer() {
     // 倒计时结束
     if (timeLeft <= 0) {
       clearInterval(timerId);
-
-      // 播放提示音
-      const audio = new Audio('sound.mp3');
-      audio.play();
 
       // 进入休息时间或长休息时间
       if (!isBreakTime || (isBreakTime && count < settings.longBreakInterval)) {
