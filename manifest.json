@@ -1,0 +1,19 @@
+{
+  "manifest_version": 2,
+  "name": "Tomato Timer",
+  "version": "1.0.0",
+  "description": "A simple pomodoro timer extension for Edge.",
+  "icons": {
+    "16": "icon16.png",
+    "32": "icon32.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "permissions": [
+    "activeTab"
+  ]
+}
