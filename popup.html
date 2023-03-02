@@ -7,32 +7,21 @@
     <link rel="stylesheet" href="popup.css">
   </head>
   <body>
-    <div class="container py-3">
-      <div class="row">
-        <div class="col-12">
-          <h1 class="text-center">Pomodoro Timer</h1>
-        </div>
+    <div class="timer">
+      <div class="timer-title">
+        <h1 id="timer-type">Work</h1>
+        <p id="timer-cycle"></p>
       </div>
-      <div class="row">
-        <div class="col-12">
-          <div id="timer" class="display-1 text-center"></div>
-          <div class="text-center">
-            <button id="start-btn" class="btn btn-lg btn-success mx-2">Start</button>
-            <button id="pause-btn" class="btn btn-lg btn-warning mx-2">Pause</button>
-            <button id="stop-btn" class="btn btn-lg btn-danger mx-2">Stop</button>
-          </div>
-        </div>
+      <div class="timer-display">
+        <div id="timer-minutes">25</div>
+        <div id="timer-seconds">00</div>
       </div>
-      <div class="row">
-        <div class="col-6">
-          <p>Completed pomodoros: <span id="completed-pomodoros"></span></p>
-        </div>
-        <div class="col-6">
-          <p>Rest time: <span id="rest-time"></span> minutes</p>
-        </div>
+      <div class="timer-controls">
+        <button id="start-button">Start</button>
+        <button id="stop-button">Stop</button>
+        <button id="reset-button">Reset</button>
       </div>
     </div>
-
-    <script src="popup.js"></script>
+    <script src="background.js"></script>
   </body>
-</html>
+  </html>
