@@ -2,6 +2,9 @@
   "manifest_version": 2,
   "name": "Tomato Timer",
   "version": "1.0.0",
+   "permissions": [
+    "storage"
+  ],
   "description": "A simple pomodoro timer extension for Edge.",
   "icons": {
     "16": "tomato.png",
