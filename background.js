@@ -8,7 +8,7 @@ const defaultSettings = {
 };
 
 // 加载设置
-browser.storage.sync.get(defaultSettings).then((items) => {
+chrome.storage.sync.get(defaultSettings).then((items) => {
   settings = items;
 });
 
@@ -25,7 +25,7 @@ let timerState = {
 function handleTimerComplete() {
   // 发送通知
   if (settings.notifications) {
-    browser.notifications.create({
+    chrome.notifications.create({
       type: 'basic',
       iconUrl: browser.runtime.getURL('icons/icon48.png'),
       title: 'Tomato Timer',
@@ -72,7 +72,7 @@ function startTimer() {
   // 更新浏览器图标
   const timeRemaining = timerState.timeRemaining;
   const timerType = timerState.timerType;
-  browser.browserAction.setIcon({
+  chrome.browserAction.setIcon({
     path: `icons/${timerType}-${Math.floor(timeRemaining / 60)}.png`,
   });
 
@@ -81,7 +81,7 @@ function startTimer() {
   const secondsRemaining = timeRemaining % 60;
   const minutesString = minutesRemaining < 10 ? `0${minutesRemaining}` : `${minutesRemaining}`;
   const secondsString = secondsRemaining < 10 ? `0${secondsRemaining}` : `${secondsRemaining}`;
-  browser.browserAction.setTitle({
+  chrome.browserAction.setTitle({
     title: `${minutesString}:${secondsString} - ${timerType} (${timerState.currentCycle}/${settings.longBreakInterval})`,
   });
 
@@ -96,31 +96,31 @@ function startTimer() {
 }
 
 // 处理扩展程序启动事件
-browser.runtime.onStartup.addListener(() => {
-  browser.browserAction.setBadgeText({ text: '' });
+chrome.runtime.onStartup.addListener(() => {
+  chrome.browserAction.setBadgeText({ text: '' });
  
 // 处理扩展程序安装事件
-browser.runtime.onInstalled.addListener((details) => {
+chrome.runtime.onInstalled.addListener((details) => {
 // 初始化浏览器图标
-browser.browserAction.setIcon({
+chrome.browserAction.setIcon({
 path: 'icons/work-25.png',
 });
 
 // 初始化浏览器标题
-browser.browserAction.setTitle({
+chrome.browserAction.setTitle({
   title: `Tomato Timer - ${settings.workTime}:00`,
 });
 
 
 // 添加右键菜单项
-browser.contextMenus.create({
+chrome.contextMenus.create({
 id: 'start-timer',
 title: 'Start Timer',
 contexts: ['browser_action'],
 });
 
 // 添加右键菜单项点击事件处理程序
-browser.contextMenus.onClicked.addListener((info, tab) => {
+chrome.contextMenus.onClicked.addListener((info, tab) => {
 if (info.menuItemId === 'start-timer') {
 if (!timerState.isTimerRunning) {
 startTimer();
@@ -131,7 +131,7 @@ timerState.isTimerRunning = true;
 });
 
 // 处理浏览器图标单击事件
-browser.browserAction.onClicked.addListener(() => {
+chrome.browserAction.onClicked.addListener(() => {
 if (!timerState.isTimerRunning) {
 startTimer();
 timerState.isTimerRunning = true;
@@ -139,7 +139,7 @@ timerState.isTimerRunning = true;
 });
 
 // 处理浏览器图标右键菜单项点击事件
-browser.browserAction.setPopup({
+chrome.browserAction.setPopup({
 popup: 'popup.html',
 }); 
 
