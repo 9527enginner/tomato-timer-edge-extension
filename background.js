@@ -1,91 +1,143 @@
-// 設置番茄鐘的默認设置
+// 默认设置
 const defaultSettings = {
   workTime: 25,
   breakTime: 5,
   longBreakTime: 15,
-  longBreakInterval: 4
+  longBreakInterval: 4,
+  notifications: true,
 };
 
-// 初始化番茄鐘
-let timerId;
-let settings = {};
-
-// 加載设置設置
-chrome.storage.sync.get(defaultSettings, (items) => {
+// 加载设置
+browser.storage.sync.get(defaultSettings).then((items) => {
   settings = items;
 });
 
-// 创建一个新的计时器
-function createTimer() {
-  let timeLeft = settings.workTime * 60;
-  let isBreakTime = false;
-  let isLongBreakTime = false;
-  let count = 0;
+let settings = defaultSettings;
+let timerState = {
+  isTimerRunning: false,
+  timeRemaining: settings.workTime * 60,
+  timerType: 'work',
+  timerId: null,
+  currentCycle: 1,
+};
 
-  // 每秒更新倒计时
-  timerId = setInterval(() => {
-    timeLeft--;
-
-    // 更新番茄钟图标
-    chrome.browserAction.setIcon({
-      path: `images/${isBreakTime ? 'break' : 'work'}${isLongBreakTime ? '-long' : ''}.png`
+// 处理定时器结束事件
+function handleTimerComplete() {
+  // 发送通知
+  if (settings.notifications) {
+    browser.notifications.create({
+      type: 'basic',
+      iconUrl: browser.runtime.getURL('icons/icon48.png'),
+      title: 'Tomato Timer',
+      message: 'Time is up!',
     });
+  }
 
-    // 倒计时结束
-    if (timeLeft <= 0) {
-      clearInterval(timerId);
+  // 播放声音
+  const sound = new Audio(browser.runtime.getURL('assets/bell.mp3'));
+  sound.play();
 
-      // 进入休息时间或长休息时间
-      if (!isBreakTime || (isBreakTime && count < settings.longBreakInterval)) {
-        timeLeft = settings.breakTime * 60;
-        isBreakTime = true;
+  // 根据计时器类型更新时间和循环计数器
+  switch (timerState.timerType) {
+    case 'work':
+      timerState.timeRemaining = settings.breakTime * 60;
+      timerState.timerType = 'break';
+      break;
+    case 'break':
+      timerState.currentCycle += 1;
+      if (timerState.currentCycle > settings.longBreakInterval) {
+        timerState.timeRemaining = settings.longBreakTime * 60;
+        timerState.currentCycle = 1;
       } else {
-        timeLeft = settings.longBreakTime * 60;
-        isBreakTime = false;
-        count = 0;
+        timerState.timeRemaining = settings.workTime * 60;
+        timerState.timerType = 'work';
       }
-
-      // 如果是休息时间，则增加番茄钟数目
-      if (isBreakTime) {
-        count++;
-      }
-
-      // 开始下一个计时器
-      setTimeout(() => {
-        createTimer();
-      }, timeLeft * 1000);
-    }
-  }, 1000);
-}
-
-// 启动番茄钟
-function startTimer() {
-  createTimer();
-}
-
-// 停止番茄钟
-function stopTimer() {
-  clearInterval(timerId);
-  chrome.browserAction.setIcon({ path: 'images/work.png' });
-}
-
-// 接收来自 popup 页面的消息
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  switch (request.type) {
-    case 'start':
-      startTimer();
       break;
-    case 'stop':
-      stopTimer();
-      break;
-    case 'getSettings':
-      sendResponse(settings);
+    case 'longBreak':
+      timerState.timeRemaining = settings.workTime * 60;
+      timerState.timerType = 'work';
+      timerState.currentCycle = 1;
       break;
   }
+
+  // 开始下一个计时器
+  timerState.timerId = setTimeout(startTimer, 1000);
+}
+
+// 启动计时器
+function startTimer() {
+  // 更新剩余时间
+  timerState.timeRemaining -= 1;
+
+  // 更新浏览器图标
+  const timeRemaining = timerState.timeRemaining;
+  const timerType = timerState.timerType;
+  browser.browserAction.setIcon({
+    path: `icons/${timerType}-${Math.floor(timeRemaining / 60)}.png`,
+  });
+
+  // 更新浏览器标题
+  const minutesRemaining = Math.floor(timeRemaining / 60);
+  const secondsRemaining = timeRemaining % 60;
+  const minutesString = minutesRemaining < 10 ? `0${minutesRemaining}` : `${minutesRemaining}`;
+  const secondsString = secondsRemaining < 10 ? `0${secondsRemaining}` : `${secondsRemaining}`;
+  browser.browserAction.setTitle({
+    title: `${minutesString}:${secondsString} - ${timerType} (${timerState.currentCycle}/${settings.longBreakInterval})`,
+  });
+
+  // 如果计时器结束，则处理结束事件
+  if (timerState.timeRemaining <= 0) {
+    handleTimerComplete();
+    return;
+  }
+
+  // 否则继续计时
+  timerState.timerId = setTimeout(startTimer, 1000);
+}
+
+// 处理扩展程序启动事件
+browser.runtime.onStartup.addListener(() => {
+  browser.browserAction.setBadgeText({ text: '' });
+ 
+// 处理扩展程序安装事件
+browser.runtime.onInstalled.addListener((details) => {
+// 初始化浏览器图标
+browser.browserAction.setIcon({
+path: 'icons/work-25.png',
 });
 
-// 注册浏览器图标单击事件
-chrome.browserAction.onClicked.addListener(() => {
-  // 向 popup 页面发送消息
-  chrome.runtime.sendMessage({ type: 'openPopup' });
+// 初始化浏览器标题
+browser.browserAction.setTitle({
+title: Tomato Timer - ${settings.workTime}:00,
+});
+
+// 添加右键菜单项
+browser.contextMenus.create({
+id: 'start-timer',
+title: 'Start Timer',
+contexts: ['browser_action'],
+});
+
+// 添加右键菜单项点击事件处理程序
+browser.contextMenus.onClicked.addListener((info, tab) => {
+if (info.menuItemId === 'start-timer') {
+if (!timerState.isTimerRunning) {
+startTimer();
+timerState.isTimerRunning = true;
+}
+}
+});
+});
+
+// 处理浏览器图标单击事件
+browser.browserAction.onClicked.addListener(() => {
+if (!timerState.isTimerRunning) {
+startTimer();
+timerState.isTimerRunning = true;
+}
+});
+
+// 处理浏览器图标右键菜单项点击事件
+browser.browserAction.setPopup({
+popup: 'popup.html',
 });
