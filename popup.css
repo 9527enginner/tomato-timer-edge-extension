@@ -1,16 +1,65 @@
-#timer {
-  font-size: 6rem;
-  margin: 2rem 0;
+body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-.btn {
-  font-size: 2rem;
+.timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
 }
 
-#completed-pomodoros {
-  font-weight: bold;
+.timer-title {
+  margin-bottom: 10px;
 }
 
-#rest-time {
-  font-weight: bold;
+.timer-title h1 {
+  font-size: 30px;
+  margin: 0;
+}
+
+.timer-title p {
+  font-size: 14px;
+  margin: 0;
+}
+
+.timer-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.timer-display div {
+  font-size: 80px;
+  padding: 0 10px;
+  border-radius: 5px;
+  background-color: #eee;
+  color: #333;
+  text-align: center;
+}
+
+.timer-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timer-controls button {
+  font-size: 16px;
+  padding: 10px 20px;
+  margin: 0 5px;
+  border-radius: 5px;
+  background-color: #eee;
+  color: #333;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.timer-controls button:hover {
+  background-color: #ccc;
 }
