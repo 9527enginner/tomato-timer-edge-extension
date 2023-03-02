@@ -108,8 +108,9 @@ path: 'icons/work-25.png',
 
 // 初始化浏览器标题
 browser.browserAction.setTitle({
-title: Tomato Timer - ${settings.workTime}:00,
+  title: `Tomato Timer - ${settings.workTime}:00`,
 });
+
 
 // 添加右键菜单项
 browser.contextMenus.create({
