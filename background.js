@@ -8,7 +8,7 @@ const defaultSettings = {
 };
 
 // 加载设置
-chrome.storage.sync.get(defaultSettings).then((items) => {
+chrome.storage.sync.get(defaultSettings, (items) => {
   settings = items;
 });
 
