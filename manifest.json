@@ -13,8 +13,11 @@
     "128": "tomato.png"
   },
   "background": {
-    "scripts": ["background.js"],
-    "persistent": false
+    "service_worker": "background.js"
+  },
+  "browser_action": {
+    "default_title": "My Extension",
+    "default_popup": "popup.html"
   },
   "permissions": [
     "storage",
