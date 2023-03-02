@@ -141,4 +141,6 @@ timerState.isTimerRunning = true;
 // 处理浏览器图标右键菜单项点击事件
 browser.browserAction.setPopup({
 popup: 'popup.html',
+}); 
+
 });
